@@ -60,17 +60,17 @@ You can create many different kubernetes topologies by setting the number of
 different classes of hosts. For each class there are options for allocating
 floating IP addresses or not.
 
-- Master nodes with etcd
-- Master nodes without etcd
+- Control plane nodes with etcd
+- Control plane nodes without etcd
 - Standalone etcd hosts
 - Kubernetes worker nodes
 
 Note that the Ansible script will report an invalid configuration if you wind up
 with an even number of etcd instances since that is not a valid configuration. This
 restriction includes standalone etcd nodes that are deployed in a cluster along with
-master nodes with etcd replicas. As an example, if you have three master nodes with
-etcd replicas and three standalone etcd nodes, the script will fail since there are
-now six total etcd replicas.
+control plane nodes with etcd replicas. As an example, if you have three control plane
+nodes with etcd replicas and three standalone etcd nodes, the script will fail since
+there are now six total etcd replicas.
 
 ### GlusterFS shared file system
 
@@ -258,7 +258,8 @@ For your cluster, edit `inventory/$CLUSTER/cluster.tfvars`.
 |`bastion_fips` | A list of floating IPs that you have already pre-allocated; they will be attached to bastion node instead of creating new random floating IPs. |
 |`external_net` | UUID of the external network that will be routed to |
 |`flavor_k8s_master`,`flavor_k8s_node`,`flavor_etcd`, `flavor_bastion`,`flavor_gfs_node` | Flavor depends on your openstack installation, you can get available flavor IDs through `openstack flavor list` |
-|`image`,`image_gfs` | Name of the image to use in provisioning the compute resources. Should already be loaded into glance. |
+|`image`,`image_gfs`, `image_master` | Name of the image to use in provisioning the compute resources. Should already be loaded into glance. |
+|`image_uuid`,`image_gfs_uuid`, `image_master_uuid` | UUID of the image to use in provisioning the compute resources. Should already be loaded into glance. |
 |`ssh_user`,`ssh_user_gfs` | The username to ssh into the image with. This usually depends on the image you have selected |
 |`public_key_path` | Path on your local workstation to the public key file you wish to use in creating the key pairs |
 |`number_of_k8s_masters`, `number_of_k8s_masters_no_floating_ip` | Number of nodes that serve as both master and etcd. These can be provisioned with or without floating IP addresses|

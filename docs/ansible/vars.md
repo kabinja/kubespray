@@ -216,6 +216,8 @@ Stack](https://github.com/kubernetes-sigs/kubespray/blob/master/docs/dns-stack.m
   The percent is calculated by dividing this field value by 100, so the field value must be between 0 and 100, inclusive.
   When specified, the value must be less than imageGCHighThresholdPercent. Default: 80
 
+* *kubelet_max_parallel_image_pulls* - Sets the maximum number of image pulls in parallel. The value is `1` by default which means the default is serial image pulling, set it to a integer great than `1` to enable image pulling in parallel.
+
 * *kubelet_make_iptables_util_chains* - If `true`, causes the kubelet ensures a set of `iptables` rules are present on host.
 
 * *kubelet_cpu_manager_policy* -  If set to `static`, allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. And it should be set with `kube_reserved` or `system-reserved`, enable this with the following guide:[Control CPU Management Policies on the Node](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/)
@@ -242,6 +244,10 @@ kubelet_cpu_manager_policy_options:
     The **control plane** node may have 2 interfaces with the following IP addresses: `eth0:10.0.0.110`, `eth1:192.168.1.110`.
 
     By default the `kubelet_secure_addresses` is set with the `10.0.0.110` the ansible control host uses `eth0` to  connect to the machine. In case you want to use `eth1` as the outgoing interface on which `kube-apiserver` connects to the `kubelet`s, you should override the variable in this way: `kubelet_secure_addresses: "192.168.1.110"`.
+
+* *kubelet_systemd_wants_dependencies* - List of kubelet service dependencies, other than container runtime.
+
+  If you use nfs dynamically mounted volumes, sometimes rpc-statd does not start within the kubelet. You can fix it with this parameter : `kubelet_systemd_wants_dependencies: ["rpc-statd.service"]` This will add `Wants=rpc-statd.service` in `[Unit]` section of /etc/systemd/system/kubelet.service
 
 * *node_labels* - Labels applied to nodes via `kubectl label node`.
   For example, labels can be set in the inventory as variables or more widely in group_vars.
@@ -290,8 +296,8 @@ node_taints:
 
 For all kube components, custom flags can be passed in. This allows for edge cases where users need changes to the default deployment that may not be applicable to all deployments.
 
-Extra flags for the kubelet can be specified using these variables,
-in the form of dicts of key-value pairs of configuration parameters that will be inserted into the kubelet YAML config file. The `kubelet_node_config_extra_args` apply kubelet settings only to nodes and not control planes. Example:
+Extra flags for the kubelet can be specified using these variables, in the form of dicts of key-value pairs of
+configuration parameters that will be inserted into the kubelet YAML config file. Example:
 
 ```yml
 kubelet_config_extra_args:
@@ -306,14 +312,10 @@ kubelet_config_extra_args:
 The possible vars are:
 
 * *kubelet_config_extra_args*
-* *kubelet_node_config_extra_args*
 
 Previously, the same parameters could be passed as flags to kubelet binary with the following vars:
 
 * *kubelet_custom_flags*
-* *kubelet_node_custom_flags*
-
-The `kubelet_node_custom_flags` apply kubelet settings only to nodes and not control planes. Example:
 
 ```yml
 kubelet_custom_flags:
@@ -330,6 +332,13 @@ in the form of dicts of key-value pairs of configuration parameters that will be
 * *kube_kubeadm_apiserver_extra_args*
 * *kube_kubeadm_controller_extra_args*
 * *kube_kubeadm_scheduler_extra_args*
+
+### Kubeadm patches
+
+When extra flags are not sufficient and there is a need to further customize kubernetes components,
+[kubeadm patches](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/#patches)
+can be used.
+You should use the [`kubeadm_patches` variable](../../roles/kubernetes/kubeadm_common/defaults/main.yml) for that purpose.
 
 ## App variables
 

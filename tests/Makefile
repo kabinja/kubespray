@@ -35,8 +35,8 @@ cleanup-packet:
 
 create-vagrant:
 	vagrant up
-	find / -name vagrant_ansible_inventory
-	cp  /builds/kargo-ci/kubernetes-sigs-kubespray/inventory/sample/vagrant_ansible_inventory $(INVENTORY)
+	cp  $(CI_PROJECT_DIR)/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory $(INVENTORY)
+
 
 delete-vagrant:
 	vagrant destroy -f
